@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Matching Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #gameBoard {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-gap: 10px;
+            justify-content: center;
+            margin: 20px auto;
+        }
+        .card {
+            width: 100px;
+            height: 100px;
+            background-color: #cccccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .matched {
+            background-color: #8BC34A;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Memory Matching Game</h1>
+    <p>คลิกเพื่อจับคู่การ์ด</p>
+    <div id="gameBoard"></div>
+
+    <script>
+        const icons = ["🍎", "🍌", "🍇", "🍉", "🍎", "🍌", "🍇", "🍉"];
+        let firstCard = null;
+        let secondCard = null;
+        let canClick = true;
+
+        // สุ่มไอคอน
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // สร้างกระดานเกม
+        function createBoard() {
+            const gameBoard = document.getElementById("gameBoard");
+            const shuffledIcons = shuffle(icons.slice());
+
+            shuffledIcons.forEach((icon, index) => {
+                const card = document.createElement("div");
+                card.classList.add("card");
+                card.dataset.icon = icon;
+
+                // การคลิกการ์ด
+                card.addEventListener("click", function () {
+                    if (!canClick || card.classList.contains("matched")) return;
+                    
+                    card.textContent = icon;
+
+                    if (!firstCard) {
+                        firstCard = card;
+                    } else {
+                        secondCard = card;
+                        canClick = false;
+
+                        if (firstCard.dataset.icon === secondCard.dataset.icon) {
+                            firstCard.classList.add("matched");
+                            secondCard.classList.add("matched");
+                            resetTurn();
+                        } else {
+                            setTimeout(() => {
+                                firstCard.textContent = "";
+                                secondCard.textContent = "";
+                                resetTurn();
+                            }, 1000);
+                        }
+                    }
+                });
+
+                gameBoard.appendChild(card);
+            });
+        }
+
+        // รีเซ็ตการจับคู่
+        function resetTurn() {
+            firstCard = null;
+            secondCard = null;
+            canClick = true;
+        }
+
+        createBoard();
+    </script>
+</body>
+</html>
